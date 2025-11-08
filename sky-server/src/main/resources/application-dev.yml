@@ -6,3 +6,16 @@ sky:
     database: sky_take_out
     username: root
     password: hh112211
+
+#  alioss: #IAM OSS 权限only
+#    endpoint: oss-cn-wulanchabu.aliyuncs.com
+#    access-key-id: LTAI5tEzi287FhSVuvF685eU
+#    access-key-secret: QlnF3DRVMhX8YeSmZhIh1FSGnqsoZL
+#    bucket-name: sky-itcast-jiale
+
+  alioss: #IAM OSS 权限only
+    endpoint: oss-cn-wulanchabu.aliyuncs.com
+    access-key-id: LTAI5tEzi287FhSVuvF685eU
+    access-key-secret: QlnF3DRVMhX8YeSmZhIh1FSGnqsoZL
+    bucket-name: sky-itcast-jiale
+
