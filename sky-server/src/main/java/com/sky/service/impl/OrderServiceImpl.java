@@ -153,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("调用updateStatus，更新支付的数据库信息");
         orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time,orderNumber);
 
-        //TODO 完善商家界面提醒功能
+
         Map map = new HashMap();
         map.put("type", 1);// 消息类型，1表示来单提醒
         //获取订单id
@@ -174,6 +174,7 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param outTradeNo
      */
+    //TODO 完善微信支付：目前绕过了微信支付（直接修改了支付状态），这个方法被架空
     public void paySuccess(String outTradeNo) {
 
         // 根据订单号查询订单
@@ -534,5 +535,36 @@ public class OrderServiceImpl implements OrderService {
 
         orderMapper.update(orders);
     }
+
+    /**
+     * 用户催单
+     *
+     * @param id
+     */
+    public void reminder(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+
+        // 校验订单是否存在
+        if (ordersDB == null ) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Map map = new HashMap();
+        map.put("type", 2);// 消息类型，2表示客户催单
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + ordersDB.getNumber());
+
+        String json = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(json);
+
+    }
+
+
+
+
+
+
 
 }
