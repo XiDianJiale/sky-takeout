@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -97,5 +98,21 @@ public class ReportController {
         return Result.success(reportService.getTop10(begin, end));
     }
 
+
+
+    /**
+     * export报表
+     * @param response
+     * @return
+     */
+    @GetMapping("/export")
+    @ApiOperation("export报表")
+    //必须要传入HttpServletResponse，因为 Excel 文件不是在后端生成完保存到服务器，而是要通过 HTTP 直接返回给浏览器下载。
+    //理解：Controller中方法传入的对象并不neccessarily是前端传过来的参数，也可以是后端Spring框架会自动注入上下文对象进来，
+    //那么这里来说就是Spring从当前线程拿出 response传给了这个方法
+    public Result export(HttpServletResponse response) {
+        reportService.export(response);
+        return Result.success();
+    }
 
 }
