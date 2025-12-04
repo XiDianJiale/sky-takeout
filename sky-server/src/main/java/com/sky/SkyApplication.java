@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableCaching //开启缓存注解功能
 @EnableScheduling
 public class SkyApplication {
-    public static void main(String[] args) {
+    public static void main(String[] args) { //启动可选出传入args：命令行参数
         SpringApplication.run(SkyApplication.class, args);
         log.info("server started");
     }
