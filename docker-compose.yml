@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # 1. 数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: sky-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: hh112211 # 对应你配置的密码
+      MYSQL_DATABASE: sky_take_out  # 启动时自动创建这个库
+    volumes:
+      - ./mysql_data:/var/lib/mysql # 数据持久化，防止容器重启数据丢失
+      # 如果你有建表 sql 文件，可以放在根目录下的 sql 文件夹中自动初始化：
+      # - ./sql:/docker-entrypoint-initdb.d
+    restart: always
+
+  # 2. Redis 缓存服务
+  redis:
+    image: redis:6.2-alpine
+    container_name: sky-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass 123456 # 对应你配置的 Redis 密码
+    restart: always
+
+  # 3. 后端 Java 服务
+  backend:
+    build:
+      context: . # 指向根目录的 Dockerfile
+    # 强制制定平台架构
+    platform: linux/amd64
+    container_name: sky-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      # 通过环境变量覆盖 application.yml 中的 localhost 为容器名
+      - SPRING_DATASOURCE_HOST=mysql
+      - SPRING_DATASOURCE_PORT=3306
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      # 建议你的阿里云配置也改成从环境变量读取，避免硬编码泄露
+    restart: always
+  # 4. 前端(直接用nginx来托管编译后的静态文件)
+  frontend:
+#    image: nginx:1.20.2
+    build:
+        context: ./sky-nginx
+    # 强制制定平台架构
+    platform: linux/amd64
+    container_name: sky-frontend
+    ports:
+      - "80:80"
+#    volumes:     这里是挂载本地作为映射，完全不需要，因为我们容器化自定义的镜像而不是仅仅nginx
+#      # 挂载配置文件
+#      - ./sky-nginx/nginx-1.20.2/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+#      - ./sky-nginx/nginx-1.20.2/conf:/etc/nginx/conf:ro
+#      # 挂载静态文件
+#      - ./sky-nginx/nginx-1.20.2/html:/usr/share/nginx/html:ro
+#      # 挂载日志目录（可写）
+#      - ./sky-nginx/nginx-1.20.2/logs:/var/log/nginx
+    depends_on:
+      - backend
+    restart: always
+
+  # 4. 前端服务 (假设sky-frontend)
+  # frontend:
+  #   image: sky-frontend
+  #   container_name: sky-frontend
+  #   ports:
+  #     - "80:80"
+  #   restart: always
