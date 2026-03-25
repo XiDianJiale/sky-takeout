@@ -1,0 +1,67 @@
+# 1. Redis 部署
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deploy
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6.2-alpine
+          command: ["redis-server", "--requirepass", "123456"]
+          ports:
+            - containerPort: 6379
+---
+# 2. Redis 服务 (让后端能通过名字 "redis" 找到它)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+---
+# 3. MySQL 部署
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root"
+            - name: MYSQL_DATABASE
+              value: "sky_take_out"
+          ports:
+            - containerPort: 3306
+---
+# 4. MySQL 服务 (让后端能通过名字 "mysql" 找到它)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306

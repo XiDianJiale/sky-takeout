@@ -39,10 +39,10 @@ services:
       - redis
     environment:
       # 通过环境变量覆盖 application.yml 中的 localhost 为容器名
-      - SPRING_DATASOURCE_HOST=mysql
-      - SPRING_DATASOURCE_PORT=3306
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
+      - SKY_DATASOURCE_HOST=mysql
+      - SKY_DATASOURCE_PORT=3306
+      - SKY_REDIS_HOST=redis
+      - SKY_REDIS_PORT=6379
       # 建议你的阿里云配置也改成从环境变量读取，避免硬编码泄露
     restart: always
   # 4. 前端(直接用nginx来托管编译后的静态文件)
